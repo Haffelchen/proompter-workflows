@@ -1,0 +1,22 @@
+{
+  "components": [
+    {
+      "id": "systemPrompt",
+      "type": 2001,
+      "inputs": {
+        "promptId": "e524c518-ee26-48ac-83b1-5a9ffb0444ed"
+      }
+    },
+    {
+      "id": "gptGenerateResponse",
+      "type": 3000,
+      "inputs": {
+        "model": "gpt-3.5-turbo-16k-0613",
+        "systemPrompt": "{{prompt}}"
+      },
+      "dependsOnComponentsWithId": [
+        "systemPrompt"
+      ]
+    }
+  ]
+}

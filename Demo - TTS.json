@@ -1,0 +1,95 @@
+{
+    "components": [
+        {
+            "id": "deferReply",
+            "type": 1005,
+            "isEphemeral": true
+        },
+        {
+            "id": "buildActionRows",
+            "type": 1203,
+            "buttons": [
+                {
+                    "customId": "tts_input",
+                    "label": "TTS Input",
+                    "style": 1
+                }
+            ]
+        },
+        {
+            "id": "sendInputButton",
+            "type": 1001,
+            "sendContent": "# TTS - Test",
+            "sendComponents": "{{actionRows}}",
+            "dependsOnComponentsWithId": [
+                "deferReply",
+                "buildActionRows"
+            ]
+        },
+        {
+            "id": "ttsInputModal",
+            "type": 1202,
+            "inputs": {
+                "customId": "tts_input_modal;{{memberId}}_{{interactionId}}",
+                "title": "TTS - Input",
+                "textInputFields": [
+                    {
+                        "id": "tts_input",
+                        "label": "TTS - Input",
+                        "style": 2,
+                        "required": true
+                    }
+                ],
+                "modalInteraction": {
+                    "response": "*Vocal cords get tuned* <a:discord_typing:1128269171503943811>",
+                    "callWorkflowUUID": "701d9d0f-107b-47fb-a66d-39ac6558dc26",
+                    "callWorkflowComponentId": "tts"
+                }
+            },
+            "setModalAsInteraction": true
+        },
+        {
+            "id": "buttonTriggerInput",
+            "type": 1004,
+            "customId": "tts_input",
+            "sendModal": "{{modal}}",
+            "dependsOnComponentsWithId": [
+                "ttsInputModal"
+            ]
+        },
+        {
+            "id": "tts",
+            "type": 3002,
+            "inputs": {
+                "ttsInput": "{{tts_input}}"
+            },
+            "model": "tts-1",
+            "voice": "nova",
+            "outputFormat": "mp3",
+            "callComponentsWithId": [
+                "buildAttachment",
+                "sendResponse"
+            ]
+        },
+        {
+            "id": "buildAttachment",
+            "type": 1301,
+            "attachmentBufferKey": "{{ttsBufferId}}",
+            "attachmentName": "tts-workflow-demo.mp3"
+        },
+        {
+            "id": "sendResponse",
+            "type": 1001,
+            "attachmentCacheIds": [
+                "{{attachmentCacheId}}"
+            ]
+        }
+    ],
+    "entryPoints": [
+        "sendInputButton"
+    ],
+    "triggerComponents": [
+        "buttonTriggerInput"
+    ],
+    "executionType": 0
+}

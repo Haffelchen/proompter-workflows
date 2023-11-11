@@ -1,0 +1,17 @@
+{
+  "components": [
+    {
+      "id": "gptGenerateStoryTopicSuggestion",
+      "type": 3000,
+      "inputs": {
+        "model": "gpt-3.5-turbo-0301",
+        "systemPrompt": "Please give me a one sentence topic for an interactive story"
+      }
+    },
+    {
+      "id": "respondGPTStoryTopicSuggestion",
+      "type": 1001,
+      "sendContent": "```\n{{gptResponse}}\n```"
+    }
+  ]
+}

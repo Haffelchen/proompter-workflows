@@ -1,0 +1,31 @@
+{
+  "components": [
+    {
+      "id": "tts",
+      "type": 3002,
+      "inputs": {
+        "ttsInput": "This is a TTS text input"
+      },
+      "model": "tts-1",
+      "voice": "nova",
+      "outputFormat": "mp3",
+      "callComponentsWithId": [
+        "buildAttachment",
+        "sendResponse"
+      ]
+    },
+    {
+      "id": "buildAttachment",
+      "type": 1301,
+      "attachmentBufferKey": "{{ttsBufferId}}",
+      "attachmentName": "tts-component-demo.mp3"
+    },
+    {
+      "id": "sendResponse",
+      "type": 1001,
+      "attachmentCacheIds": [
+        "{{attachmentCacheId}}"
+      ]
+    }
+  ]
+}

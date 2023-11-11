@@ -1,0 +1,68 @@
+{
+  "components": [
+    {
+      "id": "deferReply",
+      "type": 1005,
+      "isEphemeral": true
+    },
+    {
+      "id": "buildActionRows",
+      "type": 1203,
+      "buttons": [
+        {
+          "customId": "OPEN_INPUT",
+          "label": "Click to open input modal",
+          "style": 1
+        }
+      ]
+    },
+    {
+      "id": "sendOpenInputButton",
+      "type": 1001,
+      "sendContent": "# Single Button - Modal Input Component",
+      "sendComponents": "{{actionRows}}",
+      "dependsOnComponentsWithId": [
+        "deferReply",
+        "buildActionRows"
+      ]
+    },
+    {
+      "id": "inputModal",
+      "type": 1202,
+      "inputs": {
+        "customId": "INPUT_MODAL;{{memberId}}_{{interactionId}}",
+        "title": "TITLE",
+        "textInputFields": [
+          {
+            "id": "INPUT_FIELD",
+            "label": "INPUT",
+            "style": 2,
+            "required": true
+          }
+        ],
+        "modalInteraction": {
+          "response": "*Processing input* <a:discord_typing:1128269171503943811>",
+          "callWorkflowUUID": "UUID",
+          "callWorkflowComponentId": "COMPONENT_TO_CALL"
+        }
+      },
+      "setModalAsInteraction": true
+    },
+    {
+      "id": "buttonTriggerOpenInput",
+      "type": 1004,
+      "customId": "BUTTON_OPEN_INPUT_MODAL",
+      "sendModal": "{{modal}}",
+      "dependsOnComponentsWithId": [
+        "inputModal"
+      ]
+    }
+  ],
+  "entryPoints": [
+    "sendOpenInputButton"
+  ],
+  "triggerComponents": [
+    "buttonTriggerOpenInput"
+  ],
+  "executionType": 0
+}

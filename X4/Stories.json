@@ -1,0 +1,147 @@
+{
+  "components": [
+    {
+      "id": "systemPromptTextAdventure",
+      "type": 2001,
+      "inputs": {
+        "promptId": "bf4ddcc4-4d3e-4376-ab18-2c73032c41db"
+      }
+    },
+    {
+      "id": "deferReply",
+      "type": 1005,
+      "isEphemeral": true
+    },
+    {
+      "id": "buildActionRows",
+      "type": 1203,
+      "buttons": [
+        {
+          "customId": "story_tts_dalle_x4_prompt",
+          "label": "Set Topic",
+          "style": 1
+        }
+      ]
+    },
+    {
+      "id": "sendInputButton",
+      "type": 1001,
+      "sendContent": "# Story Generator",
+      "sendComponents": "{{actionRows}}",
+      "dependsOnComponentsWithId": [
+        "deferReply",
+        "buildActionRows"
+      ]
+    },
+    {
+      "id": "buttonTriggerInput",
+      "type": 1004,
+      "customId": "story_tts_dalle_x4_prompt",
+      "sendModal": "{{modal}}",
+      "dependsOnComponentsWithId": [
+        "storyTopicModal"
+      ]
+    },
+    {
+      "id": "storyTopicModal",
+      "type": 1202,
+      "inputs": {
+        "title": "Story Generator - Topic",
+        "customId": "aio_story_topic_modal;{{memberId}}_{{interactionId}}",
+        "textInputFields": [
+          {
+            "id": "story_topic",
+            "label": "Story Topic",
+            "style": 2,
+            "required": true
+          }
+        ],
+        "modalInteraction": {
+          "response": "*Living an adventure* <a:discord_typing:1128269171503943811>",
+          "callWorkflowUUID": "eb12524f-0359-441e-b1b3-6068568edb7c",
+          "callWorkflowComponentId": "gptGenerateStoryChunk"
+        }
+      }
+    },
+    {
+      "id": "buttonOption",
+      "type": 1004,
+      "customId": "story_tts_dalle_x4_btn;option",
+      "callComponentsWithId": [
+        "gptGenerateStoryChunk"
+      ]
+    },
+    {
+      "id": "gptGenerateStoryChunk",
+      "type": 3000,
+      "inputs": {
+        "model": "gpt-3.5-turbo-16k-0613",
+        "systemPrompt": "{{prompt}}",
+        "userMessage": "{{story_topic}}"
+      },
+      "callComponentsWithId": [
+        "dallE",
+        "tts",
+        "sendImageResponse",
+        "respondStory"
+      ],
+      "dependsOnComponentsWithId": [
+        "systemPromptTextAdventure"
+      ]
+    },
+    {
+      "id": "processStoryOutput",
+      "type": 100001,
+      "inputs": {
+        "path": "story",
+        "object": "{{gptResponse}}"
+      }
+    },
+    {
+      "id": "dallE",
+      "type": 3003,
+      "prompt": "{{gptResponse}}",
+      "model": "dall-e-3",
+      "size": "1024x1024"
+    },
+    {
+      "id": "sendImageResponse",
+      "type": 1001,
+      "sendContent": "{{gptResponse}}"
+    },
+    {
+      "id": "respondStory",
+      "type": 1001,
+      "sendContent": "{{gptResponse}}",
+      "attachmentCacheIds": [
+        "{{attachmentCacheId}}"
+      ]
+    },
+    {
+      "id": "tts",
+      "type": 3002,
+      "inputs": {
+        "ttsInput": "{{gptResponse}}"
+      },
+      "model": "tts-1",
+      "voice": "nova",
+      "outputFormat": "mp3",
+      "callComponentsWithId": [
+        "buildAttachment"
+      ]
+    },
+    {
+      "id": "buildAttachment",
+      "type": 1301,
+      "attachmentBufferKey": "{{ttsBufferId}}",
+      "attachmentName": "story-generator.mp3"
+    }
+  ],
+  "entryPoints": [
+    "sendInputButton"
+  ],
+  "executionType": 0,
+  "triggerComponents": [
+    "buttonTriggerInput"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "components": [
+    {
+      "id": "dallE",
+      "type": 3003,
+      "prompt": "A cute robot",
+      "model": "dall-e-3",
+      "size": "1024x1024",
+      "callComponentsWithId": [
+        "sendPromptsResponse",
+        "sendImageResponse"
+      ]
+    },
+    {
+      "id": "sendPromptsResponse",
+      "type": 1001,
+      "sendContent": "**Original Prompt:** \n```\nA cute robot\n```\n**Revised Prompt:** \n```\n{{revisedDallEPrompt}}\n```"
+    },
+    {
+      "id": "sendImageResponse",
+      "type": 1001,
+      "sendContent": "{{dallEImage}}"
+    }
+  ]
+}

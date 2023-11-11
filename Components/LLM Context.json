@@ -1,0 +1,48 @@
+{
+  "components": [
+    {
+      "id": "context",
+      "type": 2002,
+      "inputs": {
+        "contextId": "CONTEXT;{{memberId}}",
+        "initialContext": "[{\"role\":\"user\",\"content\":\"This is the first user message after a potential manually loaded system prompt in the context\"}]"
+      }
+    },
+    {
+      "id": "getContext",
+      "type": 2004,
+      "inputs": {
+        "contextId": "CONTEXT;{{memberId}}"
+      }
+    },
+    {
+      "id": "addUserMessageToContext",
+      "type": 2003,
+      "inputs": {
+        "contextId": "CONTEXT;{{memberId}}",
+        "addContextMessage": {
+          "role": "user",
+          "content": "Add me to context!!"
+        }
+      }
+    },
+    {
+      "id": "addAssistantMessageToContext",
+      "type": 2003,
+      "inputs": {
+        "contextId": "CONTEXT;{{memberId}}",
+        "addContextMessage": {
+          "role": "assistant",
+          "content": "{{gptResponse}}"
+        }
+      }
+    },
+    {
+      "id": "clearContext",
+      "type": 2005,
+      "inputs": {
+        "contextId": "CONTEXT;{{memberId}}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+{
+    "components": [
+        {
+            "id": "systemPromptTextAdventure",
+            "type": 2001,
+            "inputs": {
+                "promptId": "e524c518-ee26-48ac-83b1-5a9ffb0444ed"
+            }
+        },
+        {
+            "id": "memoryStorage",
+            "type": 100,
+            "inputs": {
+                "sessionId": "text_adventure;{{memberId}}"
+            }
+        },
+        {
+            "id": "textAdventureContext",
+            "type": 2002,
+            "inputs": {
+                "contextId": "text_adventure;{{memberId}}",
+                "initialContext": "[{\"role\":\"user\",\"content\":\"Topic: {{story_topic}}\"}]"
+            }
+        },
+        {
+            "id": "getContext",
+            "type": 2004,
+            "inputs": {
+                "contextId": "text_adventure;{{memberId}}"
+            }
+        },
+        {
+            "id": "deferReply",
+            "type": 1005,
+            "isEphemeral": true
+        },
+        {
+            "id": "buildActionRows",
+            "type": 1203,
+            "buttons": [
+                {
+                    "customId": "text_adventure_prompt",
+                    "label": "Text Adventure Prompt",
+                    "style": 1
+                }
+            ]
+        },
+        {
+            "id": "sendInputButton",
+            "type": 1001,
+            "sendContent": "# Text Adventure - Demo",
+            "sendComponents": "{{actionRows}}",
+            "dependsOnComponentsWithId": [
+                "deferReply",
+                "buildActionRows"
+            ]
+        },
+        {
+            "id": "buttonTriggerInput",
+            "type": 1004,
+            "customId": "text_adventure_prompt",
+            "sendModal": "{{modal}}",
+            "dependsOnComponentsWithId": [
+                "clearContext",
+                "clearSession",
+                "storyTopicModal"
+            ]
+        },
+        {
+            "id": "storyTopicModal",
+            "type": 1202,
+            "inputs": {
+                "title": "Text Adventure - Story Topic",
+                "customId": "story_topic_modal;{{memberId}}_{{interactionId}}",
+                "textInputFields": [
+                    {
+                        "id": "story_topic",
+                        "label": "Story Topic",
+                        "style": 2,
+                        "value": "Lost in an enchanted forest",
+                        "required": true,
+                        "placeholder": "Lost in an enchanted forest"
+                    }
+                ],
+                "modalInteraction": {
+                    "response": "*Preparing your Adventure* <a:discord_typing:1128269171503943811>",
+                    "callWorkflowUUID": "62563657-0e8f-4b49-b286-26735b765041",
+                    "callWorkflowComponentId": "gptGenerateStoryChunk"
+                }
+            }
+        },
+        {
+            "id": "buttonOption",
+            "type": 1004,
+            "customId": "btn;text_adventure",
+            "callComponentsWithId": [
+                "addSelectedOptionToContext",
+                "gptGenerateStoryChunk"
+            ]
+        },
+        {
+            "id": "addSelectedOptionToContext",
+            "type": 2003,
+            "inputs": {
+                "contextId": "text_adventure;{{memberId}}",
+                "addContextMessage": {
+                    "role": "user",
+                    "content": "\"{{buttonInteractionLabel}}\""
+                }
+            }
+        },
+        {
+            "id": "gptGenerateStoryTopicSuggestion",
+            "type": 3000,
+            "inputs": {
+                "model": "gpt-3.5-turbo-0301",
+                "systemPrompt": "Please give me a one sentence topic for an interactive story"
+            }
+        },
+        {
+            "id": "gptGenerateStoryChunk",
+            "type": 3000,
+            "inputs": {
+                "model": "gpt-3.5-turbo-16k-0613",
+                "context": "{{context}}",
+                "systemPrompt": "{{prompt}}"
+            },
+            "callComponentsWithId": [
+                "processStoryOutput",
+                "addStoryToContext",
+                "processOptionsOutput",
+                "processOptionsList",
+                "createOptionsActionRow"
+            ],
+            "dependsOnComponentsWithId": [
+                "textAdventureContext",
+                "getContext",
+                "systemPromptTextAdventure"
+            ]
+        },
+        {
+            "id": "addStoryToContext",
+            "type": 2003,
+            "inputs": {
+                "contextId": "text_adventure;{{memberId}}",
+                "addContextMessage": {
+                    "role": "assistant",
+                    "content": "{{gptResponse}}"
+                }
+            }
+        },
+        {
+            "id": "processStoryOutput",
+            "type": 100001,
+            "inputs": {
+                "path": "story",
+                "object": "{{gptResponse}}"
+            }
+        },
+        {
+            "id": "processOptionsOutput",
+            "type": 100001,
+            "inputs": {
+                "path": "options",
+                "object": "{{gptResponse}}"
+            }
+        },
+        {
+            "id": "processOptionsList",
+            "type": 100002,
+            "inputs": {
+                "list": "{{parsedOptions}}",
+                "outputPrefix": "buttonCustomId"
+            }
+        },
+        {
+            "id": "createOptionsActionRow",
+            "type": 1201,
+            "inputs": {
+                "buttons": {
+                    "style": 2,
+                    "customIdPrefix": "btn;text_adventure",
+                    "componentLabelKeys": "{{listEntryIds}}"
+                }
+            },
+            "callComponentsWithId": [
+                "respondOptions"
+            ]
+        },
+        {
+            "id": "respondOptions",
+            "type": 1001,
+            "sendContent": "```\n{{parsedStory}}\n```",
+            "sendComponents": "{{actionRows}}"
+        },
+        {
+            "id": "clearContext",
+            "type": 2005,
+            "inputs": {
+                "contextId": "text_adventure;{{memberId}}"
+            }
+        },
+        {
+            "id": "clearSession",
+            "type": 101,
+            "inputs": {
+                "sessionId": "text_adventure;{{memberId}}"
+            }
+        }
+    ],
+    "entryPoints": [
+        "sendInputButton"
+    ],
+    "executionType": 0,
+    "triggerComponents": [
+        "buttonOption",
+        "buttonTriggerInput"
+    ]
+}

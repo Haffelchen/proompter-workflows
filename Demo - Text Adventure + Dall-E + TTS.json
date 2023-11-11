@@ -1,0 +1,256 @@
+{
+  "components": [
+    {
+      "id": "systemPromptTextAdventure",
+      "type": 2001,
+      "inputs": {
+        "promptId": "e524c518-ee26-48ac-83b1-5a9ffb0444ed"
+      }
+    },
+    {
+      "id": "memoryStorage",
+      "type": 100,
+      "inputs": {
+        "sessionId": "aio_ta_dalle_tts;{{memberId}}"
+      }
+    },
+    {
+      "id": "textAdventureContext",
+      "type": 2002,
+      "inputs": {
+        "contextId": "aio_ta_dalle_tts;{{memberId}}",
+        "initialContext": "[{\"role\":\"user\",\"content\":\"Topic: {{story_topic}}\"}]"
+      }
+    },
+    {
+      "id": "getContext",
+      "type": 2004,
+      "inputs": {
+        "contextId": "aio_ta_dalle_tts;{{memberId}}"
+      }
+    },
+    {
+      "id": "deferReply",
+      "type": 1005,
+      "isEphemeral": true
+    },
+    {
+      "id": "buildActionRows",
+      "type": 1203,
+      "buttons": [
+        {
+          "customId": "aio_ta_dalle_tts_prompt",
+          "label": "Text Adventure Prompt",
+          "style": 1
+        }
+      ]
+    },
+    {
+      "id": "sendInputButton",
+      "type": 1001,
+      "sendContent": "# Text Adventure + TTS + Dall-E - Demo",
+      "sendComponents": "{{actionRows}}",
+      "dependsOnComponentsWithId": [
+        "deferReply",
+        "buildActionRows"
+      ]
+    },
+    {
+      "id": "buttonTriggerInput",
+      "type": 1004,
+      "customId": "aio_ta_dalle_tts_prompt",
+      "sendModal": "{{modal}}",
+      "dependsOnComponentsWithId": [
+        "clearContext",
+        "clearSession",
+        "storyTopicModal"
+      ]
+    },
+    {
+      "id": "storyTopicModal",
+      "type": 1202,
+      "inputs": {
+        "title": "Text Adventure - Story Topic",
+        "customId": "aio_story_topic_modal;{{memberId}}_{{interactionId}}",
+        "textInputFields": [
+          {
+            "id": "story_topic",
+            "label": "Story Topic",
+            "style": 2,
+            "value": "Lost in an enchanted forest",
+            "required": true,
+            "placeholder": "Lost in an enchanted forest"
+          }
+        ],
+        "modalInteraction": {
+          "response": "*Preparing your Adventure* <a:discord_typing:1128269171503943811>",
+          "callWorkflowUUID": "86bfba90-5801-4282-a37f-6b1f83d03989",
+          "callWorkflowComponentId": "gptGenerateStoryChunk"
+        }
+      }
+    },
+    {
+      "id": "buttonOption",
+      "type": 1004,
+      "customId": "aio_ta_dalle_tts_btn;option",
+      "callComponentsWithId": [
+        "addSelectedOptionToContext",
+        "gptGenerateStoryChunk"
+      ]
+    },
+    {
+      "id": "addSelectedOptionToContext",
+      "type": 2003,
+      "inputs": {
+        "contextId": "aio_ta_dalle_tts;{{memberId}}",
+        "addContextMessage": {
+          "role": "user",
+          "content": "\"{{buttonInteractionLabel}}\""
+        }
+      }
+    },
+    {
+      "id": "gptGenerateStoryTopicSuggestion",
+      "type": 3000,
+      "inputs": {
+        "model": "gpt-3.5-turbo-0301",
+        "systemPrompt": "Please give me a one sentence topic for an interactive story"
+      }
+    },
+    {
+      "id": "gptGenerateStoryChunk",
+      "type": 3000,
+      "inputs": {
+        "model": "gpt-3.5-turbo-16k-0613",
+        "context": "{{context}}",
+        "systemPrompt": "{{prompt}}"
+      },
+      "callComponentsWithId": [
+        "processStoryOutput",
+        "addStoryToContext",
+        "processOptionsOutput",
+        "processOptionsList",
+        "dallE",
+        "tts",
+        "sendImageResponse",
+        "createOptionsActionRow"
+      ],
+      "dependsOnComponentsWithId": [
+        "textAdventureContext",
+        "getContext",
+        "systemPromptTextAdventure"
+      ]
+    },
+    {
+      "id": "addStoryToContext",
+      "type": 2003,
+      "inputs": {
+        "contextId": "aio_ta_dalle_tts;{{memberId}}",
+        "addContextMessage": {
+          "role": "assistant",
+          "content": "{{gptResponse}}"
+        }
+      }
+    },
+    {
+      "id": "processStoryOutput",
+      "type": 100001,
+      "inputs": {
+        "path": "story",
+        "object": "{{gptResponse}}"
+      }
+    },
+    {
+      "id": "processOptionsOutput",
+      "type": 100001,
+      "inputs": {
+        "path": "options",
+        "object": "{{gptResponse}}"
+      }
+    },
+    {
+      "id": "processOptionsList",
+      "type": 100002,
+      "inputs": {
+        "list": "{{parsedOptions}}",
+        "outputPrefix": "buttonCustomId"
+      }
+    },
+    {
+      "id": "createOptionsActionRow",
+      "type": 1201,
+      "inputs": {
+        "buttons": {
+          "style": 2,
+          "customIdPrefix": "aio_ta_dalle_tts_btn;option",
+          "componentLabelKeys": "{{listEntryIds}}"
+        }
+      },
+      "callComponentsWithId": [
+        "respondOptions"
+      ]
+    },
+    {
+      "id": "dallE",
+      "type": 3003,
+      "prompt": "{{parsedStory}}",
+      "model": "dall-e-3",
+      "size": "1024x1024"
+    },
+    {
+      "id": "sendImageResponse",
+      "type": 1001,
+      "sendContent": "{{dallEImage}}"
+    },
+    {
+      "id": "respondOptions",
+      "type": 1001,
+      "sendContent": "```\n{{parsedStory}}\n```",
+      "sendComponents": "{{actionRows}}",
+      "attachmentCacheIds": [
+        "{{attachmentCacheId}}"
+      ]
+    },
+    {
+      "id": "tts",
+      "type": 3002,
+      "inputs": {
+        "ttsInput": "{{parsedStory}}"
+      },
+      "model": "tts-1",
+      "voice": "nova",
+      "outputFormat": "mp3",
+      "callComponentsWithId": [
+        "buildAttachment"
+      ]
+    },
+    {
+      "id": "buildAttachment",
+      "type": 1301,
+      "attachmentBufferKey": "{{ttsBufferId}}",
+      "attachmentName": "text-adventure-story.mp3"
+    },
+    {
+      "id": "clearContext",
+      "type": 2005,
+      "inputs": {
+        "contextId": "aio_ta_dalle_tts;{{memberId}}"
+      }
+    },
+    {
+      "id": "clearSession",
+      "type": 101,
+      "inputs": {
+        "sessionId": "aio_ta_dalle_tts;{{memberId}}"
+      }
+    }
+  ],
+  "entryPoints": [
+    "sendInputButton"
+  ],
+  "executionType": 0,
+  "triggerComponents": [
+    "buttonOption",
+    "buttonTriggerInput"
+  ]
+}

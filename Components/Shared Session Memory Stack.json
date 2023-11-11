@@ -1,0 +1,18 @@
+{
+  "components": [
+    {
+      "id": "sharedSessionMemoryStack",
+      "type": 100,
+      "inputs": {
+        "sessionId": "MEMORY_STACK;{{memberId}}"
+      }
+    },
+    {
+      "id": "clearSession",
+      "type": 101,
+      "inputs": {
+        "sessionId": "MEMORY_STACK;{{memberId}}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+    "components": [
+        {
+            "id": "deferReply",
+            "type": 1005,
+            "isEphemeral": true
+        },
+        {
+            "id": "buildActionRows",
+            "type": 1203,
+            "buttons": [
+                {
+                    "customId": "dallE_prompt",
+                    "label": "Dall-E Prompt",
+                    "style": 1
+                }
+            ]
+        },
+        {
+            "id": "sendInputButton",
+            "type": 1001,
+            "sendContent": "# Dall-E - Test",
+            "sendComponents": "{{actionRows}}",
+            "dependsOnComponentsWithId": [
+                "deferReply",
+                "buildActionRows"
+            ]
+        },
+        {
+            "id": "dallEInputModal",
+            "type": 1202,
+            "inputs": {
+                "customId": "dallE_prompt_modal;{{memberId}}_{{interactionId}}",
+                "title": "Dall-E",
+                "textInputFields": [
+                    {
+                        "id": "dallE_prompt",
+                        "label": "Dall-E - Prompt",
+                        "style": 2,
+                        "required": true
+                    }
+                ],
+                "modalInteraction": {
+                    "response": "*Colors getting mixed* <a:discord_typing:1128269171503943811>",
+                    "callWorkflowUUID": "475abf0f-2e3c-4c98-8673-866cde1ffacd",
+                    "callWorkflowComponentId": "dallE"
+                }
+            },
+            "setModalAsInteraction": true
+        },
+        {
+            "id": "buttonTriggerInput",
+            "type": 1004,
+            "customId": "dallE_prompt",
+            "sendModal": "{{modal}}",
+            "dependsOnComponentsWithId": [
+                "dallEInputModal"
+            ]
+        },
+        {
+            "id": "dallE",
+            "type": 3003,
+            "prompt": "{{dallE_prompt}}",
+            "model": "dall-e-3",
+            "size": "1024x1024",
+            "callComponentsWithId": [
+                "sendPromptsResponse",
+                "sendImageResponse"
+            ]
+        },
+        {
+            "id": "sendPromptsResponse",
+            "type": 1001,
+            "sendContent": "**Original Prompt:** \n```{{dallE_prompt}}\n```\n**Revised Prompt:** \n```\n{{revisedDallEPrompt}}\n```"
+        },
+        {
+            "id": "sendImageResponse",
+            "type": 1001,
+            "sendContent": "{{dallEImage}}"
+        }
+    ],
+    "entryPoints": [
+        "sendInputButton"
+    ],
+    "triggerComponents": [
+        "buttonTriggerInput"
+    ],
+    "executionType": 0
+}
